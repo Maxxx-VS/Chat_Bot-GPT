@@ -20,20 +20,9 @@ def handle_text_message(message):
     global received_text
     received_text = message.text
     print(received_text)
-    markup = types.InlineKeyboardMarkup()
-    btn_1 = types.InlineKeyboardButton("Отправить", callback_data="launch")
-    btn_2 = types.InlineKeyboardButton("Вывести ответ", callback_data="answer")
-    btn_3 = types.InlineKeyboardButton("GO -> TO -> MY -> GIT", url="https://github.com/Maxxx-VS?tab=repositorie")
-    markup.row(btn_1, btn_2)
-    markup.row(btn_3)
-    bot.send_message(message.chat.id, f"Отправить запрос: <b><u> {received_text} </u></b>?", reply_markup=markup,
-                     parse_mode='html')
-
-@bot.callback_query_handler(func=lambda callback: True)
-def callback_message(callback):
-    if callback.data == "launch":
-        print(callback)
-        bot.send_message(callback.message.chat.id, send_request())
+    send_request()
+    if received_text != None:
+        bot.send_message(message.chat.id, f"{content_response}")
 
 def count_tokens(text):
     tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.1")  # название модели
@@ -61,6 +50,7 @@ def process_resp(response):
     except:
         print("Ошибка получения JSON")
         return False
+
     if "error" in full_response:
         print(f"Ошибка: {full_response['error']}")
         return False
@@ -81,6 +71,9 @@ def send_request():
         return False
     content_response = full_response['choices'][0]['message']['content']
     print(content_response)
-    return content_response
+
+def end():
+    print("До новых встреч!")
+    exit(0)
 
 bot.polling(none_stop=True)
